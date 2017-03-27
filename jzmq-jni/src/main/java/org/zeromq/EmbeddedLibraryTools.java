@@ -21,6 +21,18 @@ public class EmbeddedLibraryTools {
     }
 
     public static String getCurrentPlatformIdentifier() {
+        return getArchName() + "/" + getOsName();
+    }
+
+    private static String getArchName() {
+        String archName = System.getProperty("os.arch");
+        if ("x86_64".equals(archName)) {
+            archName = "amd64";
+        }
+        return archName;
+    }
+
+    private static String getOsName() {
         String osName = System.getProperty("os.name");
         if (osName.toLowerCase().contains("windows")) {
             osName = "Windows";
@@ -29,7 +41,7 @@ public class EmbeddedLibraryTools {
         } else {
             osName = osName.replaceAll("\\s+", "_");
         }
-        return System.getProperty("os.arch") + "/" + osName;
+        return osName;
     }
 
     public static Collection<String> getEmbeddedLibraryList() {
@@ -120,21 +132,34 @@ public class EmbeddedLibraryTools {
         StringBuilder url = new StringBuilder();
         url.append("/NATIVE/");
         url.append(getCurrentPlatformIdentifier()).append("/");
+
+        File nativeDir = null;
         for (String lib : libs) {
             URL nativeLibraryUrl = null;
+            String theExt = "";
             // loop through extensions, stopping after finding first one
             for (String ext : allowedExtensions) {
                 nativeLibraryUrl = ZMQ.class.getResource(url.toString() + lib + "." + ext);
-                if (nativeLibraryUrl != null)
+                if (nativeLibraryUrl != null) {
+                    theExt = ext;
                     break;
+                }
             }
 
             if (nativeLibraryUrl != null) {
                 // native library found within JAR, extract and load
                 try {
-
-                    final File libfile = File.createTempFile(lib, ".lib");
-                    libfile.deleteOnExit(); // just in case
+                    final File libfile;
+                    if ("Windows".equals(getOsName())) {
+                        if (nativeDir == null) {
+                            nativeDir = new File("NATIVE");
+                            nativeDir.mkdir();
+                        }
+                        libfile = new File(nativeDir.toString() + "/" + lib + "." + theExt);
+                    } else {
+                        libfile = File.createTempFile(lib, ".lib");
+                        libfile.deleteOnExit(); // just in case
+                    }
 
                     final InputStream in = nativeLibraryUrl.openStream();
                     final OutputStream out = new BufferedOutputStream(new FileOutputStream(libfile));

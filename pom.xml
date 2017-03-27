@@ -8,7 +8,7 @@
   </parent>
   <groupId>org.zeromq</groupId>
   <artifactId>jzmq-parent</artifactId>
-  <version>3.1.1-SNAPSHOT</version>
+  <version>3.1.1.1</version>
   <packaging>pom</packaging>
   <description>
     The 0MQ lightweight messaging kernel is a library which extends
@@ -47,8 +47,8 @@
   </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
     <native.arch>${os.arch}</native.arch>
     <native.path.resolved>${native.path}</native.path.resolved>
     <native.library-path.resolved>${native.library-path}</native.library-path.resolved>
